@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Space Copy Operating Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: tabbed working tool. Overview (scenario, KPIs, charts, annual table) > Quarterly plan grid > Milestones timeline > Assumptions > Valuation. */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --ink:#131a2d; --muted:#586179; --line:#dbe0ea; --line-strong:#c3cad8;
+  --accent:#23379b; --accent-soft:#e7eaf8; --target:#9a6a08; --good:#1d7449; --bad:#b0281f; --warn-soft:#fbf1dd;
+  --s1:#23379b; --s2:#2a8a8a; --s3:#b98a2a;
+  --f-display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0a0f1d; --surface:#111a2e; --ink:#e4e8f2; --muted:#98a2b9; --line:#24304d; --line-strong:#34426a;
+  --accent:#93a4ff; --accent-soft:#1a2450; --target:#e2b24f; --good:#62c693; --bad:#ff8c82; --warn-soft:#2a2210;
+  --s1:#8496ff; --s2:#5cc6c2; --s3:#e2b24f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0a0f1d; --surface:#111a2e; --ink:#e4e8f2; --muted:#98a2b9; --line:#24304d; --line-strong:#34426a;
+  --accent:#93a4ff; --accent-soft:#1a2450; --target:#e2b24f; --good:#62c693; --bad:#ff8c82; --warn-soft:#2a2210;
+  --s1:#8496ff; --s2:#5cc6c2; --s3:#e2b24f; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 64px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--f-display);font-stretch:85%;text-wrap:balance;margin:0;letter-spacing:-.005em}
+h1{font-size:clamp(28px,4.4vw,40px);font-weight:750;line-height:1.05}
+h2{font-size:21px;font-weight:700}
+h3{font-size:15px;font-weight:700;font-stretch:90%}
+p{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;border-bottom:1px solid var(--line-strong);padding-bottom:16px}
+header .meta{display:flex;flex-direction:column;gap:6px;max-width:66ch}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:6px;padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+button.primary:hover{color:var(--surface);opacity:.9}
+button.danger:hover{border-color:var(--bad);color:var(--bad)}
+.toast{font-size:13px;color:var(--good);min-height:1.2em}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:7px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;border-radius:0;border-left:1px solid var(--line)}
+.seg button:first-child{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+nav.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line-strong)}
+nav.tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;padding:9px 12px;color:var(--muted);font-size:14px}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.panel{display:flex;flex-direction:column;gap:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.card-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 16px}
+.card-head p{margin-top:4px;max-width:72ch;color:var(--muted);font-size:14px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);border-radius:8px}
+.kpi{padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-left:1px solid var(--line);min-width:0}
+.kpi:nth-child(4n+1){border-left:0}
+.kpi:nth-child(n+5){border-top:1px solid var(--line)}
+.kpi .v{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:24px;font-weight:600;line-height:1.15}
+.kpi .s{font-size:12.5px;color:var(--muted)}
+.kpi.lead .v{color:var(--accent)}
+.pill{display:inline-block;font-family:var(--f-mono);font-size:11.5px;padding:2px 8px;border-radius:999px;font-weight:600;width:fit-content}
+.pill.good{background:color-mix(in srgb,var(--good) 14%,transparent);color:var(--good)}
+.pill.bad{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+.pill.neutral{background:var(--accent-soft);color:var(--accent)}
+.chart-box{overflow-x:auto}
+.chart-box svg{display:block;width:100%;min-width:620px;height:auto}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:2px;display:inline-block}
+.swl{width:16px;height:0;border-top:2px solid var(--ink);display:inline-block}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th{text-align:left;font-family:var(--f-mono);font-weight:500;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:7px 9px;border-bottom:1px solid var(--line-strong);white-space:nowrap}
+td{padding:6px 9px;border-bottom:1px solid var(--line);vertical-align:middle}
+td.r,th.r{text-align:right}
+td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+tr.sec td{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--bg);padding-top:10px}
+tr.tot td{font-weight:600;border-top:1px solid var(--line-strong)}
+td.neg{color:var(--bad)}
+.grid-tbl th:first-child,.grid-tbl td:first-child{position:sticky;left:0;background:var(--surface);z-index:1;min-width:230px;white-space:nowrap}
+.grid-tbl tr.sec td:first-child{background:var(--bg)}
+.grid-tbl th.yr{text-align:center;border-left:1px solid var(--line-strong)}
+.grid-tbl td.ys,.grid-tbl th.ys{border-left:1px solid var(--line-strong)}
+ul.list{margin:0;padding-left:18px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+.note{background:var(--warn-soft);border:1px solid color-mix(in srgb,var(--target) 35%,transparent);border-radius:8px;padding:12px 14px;font-size:13.5px;display:flex;flex-direction:column;gap:6px}
+.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px 16px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-size:12.5px;font-weight:600}
+.field .hint{font-size:12px;color:var(--muted);line-height:1.4}
+.inbox{display:flex;align-items:center;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);overflow:hidden}
+.inbox:focus-within{border-color:var(--accent)}
+.inbox .u{font-family:var(--f-mono);font-size:12px;color:var(--muted);padding:0 8px;white-space:nowrap}
+input[type=number],input[type=text],select{font:inherit;font-size:14px;color:var(--ink);background:transparent;border:0;padding:7px 8px;width:100%;min-width:0}
+input[type=number]{font-family:var(--f-mono)}
+select,td input[type=text],.addrow input[type=text]{border:1px solid var(--line-strong);border-radius:6px;background:var(--surface)}
+input:focus,select:focus{outline:none}
+td input[type=number]{border:1px solid var(--line-strong);border-radius:6px;padding:5px 6px;width:86px;text-align:right;background:var(--surface)}
+td input[type=number]:focus,td input[type=text]:focus,select:focus{border-color:var(--accent)}
+td select{width:auto;padding:5px 6px}
+.chk{display:flex;gap:8px;align-items:center;font-size:13.5px}
+details.method{border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+details.method>summary{cursor:pointer;padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:baseline;list-style:none}
+details.method>summary::-webkit-details-marker{display:none}
+details.method>summary .big{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-weight:600;color:var(--accent)}
+details.method .inner{padding:0 14px 14px;display:flex;flex-direction:column;gap:12px}
+.score{display:inline-flex;border:1px solid var(--line-strong);border-radius:6px;overflow:hidden}
+.score button{border:0;border-radius:0;padding:4px 8px;font-family:var(--f-mono);font-size:12px;border-left:1px solid var(--line)}
+.score button:first-child{border-left:0}
+.score button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+/* milestones */
+.ms-year{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
+.ms-year>h3{padding:12px 16px;border-bottom:1px solid var(--line);font-size:17px}
+.ms-q{display:grid;grid-template-columns:110px minmax(0,1fr);gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.ms-q:last-child{border-bottom:0}
+.ms-q .ql{font-family:var(--f-mono);font-size:13px;font-weight:600}
+.ms-q .ql small{display:block;font-weight:400;color:var(--muted);font-size:11.5px}
+.ms-items{display:flex;flex-direction:column;gap:6px;min-width:0}
+.ms{display:flex;gap:8px;align-items:baseline;font-size:14px;flex-wrap:wrap}
+.ms .t{flex:1 1 260px;min-width:0}
+.chip{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;border:1px solid var(--line-strong);color:var(--muted);white-space:nowrap}
+.chip.c-RD{color:var(--s1);border-color:color-mix(in srgb,var(--s1) 45%,transparent)}
+.chip.c-Manufacturing{color:var(--s2);border-color:color-mix(in srgb,var(--s2) 45%,transparent)}
+.chip.c-Hiring{color:var(--target);border-color:color-mix(in srgb,var(--target) 45%,transparent)}
+.chip.c-Sales{color:var(--good);border-color:color-mix(in srgb,var(--good) 45%,transparent)}
+.chip.c-Funding,.chip.c-Finance{color:var(--ink)}
+.src{font-size:11.5px;color:var(--muted)}
+.ms button.x{padding:1px 7px;font-size:12px}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.filters button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.addrow{display:grid;grid-template-columns:150px 160px minmax(0,1fr) auto;gap:8px;align-items:center}
+footer{font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px}
+footer a,.card a{color:var(--accent)}
+@media (max-width:860px){
+  .two{grid-template-columns:minmax(0,1fr)}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpi{border-left:1px solid var(--line)!important;border-top:1px solid var(--line)}
+  .kpi:nth-child(odd){border-left:0!important}
+  .kpi:nth-child(-n+2){border-top:0}
+  .addrow{grid-template-columns:1fr 1fr}
+  .addrow input[type=text]{grid-column:1/-1}
+  .ms-q{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:420px){.kpis{grid-template-columns:minmax(0,1fr)}.kpi{border-left:0!important;border-top:1px solid var(--line)}.kpi:first-child{border-top:0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style>
+:root{--s4:#7a4bb0}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--s4:#c49bff}}
+:root[data-theme="dark"]{--s4:#c49bff}
+.rounds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.round{border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;background:var(--bg);min-width:0}
+.round dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:5px 12px;font-size:13.5px}
+.round dt{color:var(--muted)}
+.round dd{margin:0;font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+.round .amt{font-family:var(--f-mono);font-size:22px;font-weight:600;color:var(--accent)}
+td.wide{min-width:250px}
+@media (max-width:860px){.rounds{grid-template-columns:minmax(0,1fr)}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="meta">
+      <span class="eyebrow">Space Copy Inc. · Delaware C Corporation · 60-month plan, Q1 2027 to Q4 2031</span>
+      <h1>Space Copy Operating Plan</h1>
+      <span class="muted">Growth plan for investors: what the $5M Seed and $18M Series A buy, with a team of no more than 40, how fast that capacity turns into commercial and government revenue, and when it pays back. All money in USD. Every assumption is editable on the Assumptions tab.</span>
+    </div>
+    <div class="actions">
+      <div class="seg" role="group" aria-label="Scenario">
+        <button type="button" data-scn="plan">Founder plan</button>
+        <button type="button" data-scn="investor">Investor case</button>
+      </div>
+      <button id="copySummary" class="primary" type="button">Copy summary</button>
+      <button id="reset" type="button" class="danger">Reset to defaults</button>
+    </div>
+  </header>
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button type="button" role="tab" data-tab="overview">Overview</button>
+    <button type="button" role="tab" data-tab="plan">Quarterly plan</button>
+    <button type="button" role="tab" data-tab="milestones">Milestones</button>
+    <button type="button" role="tab" data-tab="assumptions">Assumptions</button>
+    <button type="button" role="tab" data-tab="valuation">Valuation</button>
+  </nav>
+
+  <!-- OVERVIEW -->
+  <section class="panel" id="tab-overview" role="tabpanel">
+    <div class="card">
+      <div class="card-head"><div><span class="eyebrow" id="scnLabel"></span><h2>Five-year outlook</h2></div></div>
+      <div class="kpis" id="kpis"></div>
+      <ul class="list" id="insights"></ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><span class="eyebrow">Use of funds and what it unlocks</span><h2>Funding rounds</h2><p>Each round funds hires, production capacity, R&amp;D and sales spend. Its scale-up factors phase in over the ramp period after close. Revenue follows with sales and procurement lags, so the effect of a round shows up two to six quarters later.</p></div></div>
+      <div class="rounds" id="rounds"></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><span class="eyebrow">Quarterly, $</span><h2>Revenue and total costs</h2></div>
+        <div class="seg" role="group" aria-label="Chart range"><button type="button" data-range="early">First 8 quarters</button><button type="button" data-range="all">All 20 quarters</button></div>
+      </div>
+      <div class="chart-box" id="revChart"></div>
+      <div class="legend"><span><i class="sw" style="background:var(--s1)"></i>Commercial 3DaaS</span><span><i class="sw" style="background:var(--s2)"></i>AERIS system sales</span><span><i class="sw" style="background:var(--s4)"></i>Government and prime contracts</span><span><i class="sw" style="background:var(--s3)"></i>Setup and support</span><span><i class="swl"></i>Total costs (cost of revenue + operating)</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><span class="eyebrow">End of quarter, $</span><h2>Cash balance</h2><p>Includes customer deposits, build costs, production and fleet capex, the AERIS Mini and lunar programs, and the funding rounds. Triangles mark funding.</p></div></div>
+      <div class="chart-box" id="cashChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><span class="eyebrow">Annual</span><h2>Summary by year</h2></div></div>
+      <div class="tbl-wrap"><table id="annualTbl"></table></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><span class="eyebrow">Side by side</span><h2>Founder plan vs. investor case</h2><p>The investor case caps every scale-up factor, closes each round a quarter later, and lowers win and close rates. Show both: VCs will build their own version of the second column anyway.</p></div></div>
+      <div class="tbl-wrap"><table id="cmpTbl"></table></div>
+    </div>
+  </section>
+
+  <!-- PLAN -->
+  <section class="panel" id="tab-plan" role="tabpanel" hidden>
+    <div class="card">
+      <div class="card-head">
+        <div><span class="eyebrow" id="planScn"></span><h2>Quarterly plan, Q1 2027 to Q4 2031</h2><p>Figures in thousands of USD ($K) unless marked. Government rows are expected values (bids × win rate), so award counts can be fractional.</p></div>
+        <button type="button" id="copyTsv">Copy table for Excel or Sheets</button>
+      </div>
+      <div class="tbl-wrap"><table class="grid-tbl" id="planTbl"></table></div>
+    </div>
+  </section>
+
+  <!-- MILESTONES -->
+  <section class="panel" id="tab-milestones" role="tabpanel" hidden>
+    <div class="card">
+      <div class="card-head">
+        <div><span class="eyebrow" id="msScn"></span><h2>Operational milestones</h2><p>Milestones marked "From model" move with the numbers. Milestones marked "Planned" are your own commitments; add or remove them here.</p></div>
+        <button type="button" id="copyMs">Copy milestones</button>
+      </div>
+      <div class="filters" id="msFilters" role="group" aria-label="Filter by category"></div>
+      <div class="addrow">
+        <select id="msQ" aria-label="Quarter"></select>
+        <select id="msC" aria-label="Category"></select>
+        <input type="text" id="msT" placeholder="Milestone, for example: Hire Head of Manufacturing" aria-label="Milestone text">
+        <button type="button" id="msAdd" class="primary">Add milestone</button>
+      </div>
+    </div>
+    <div class="panel" id="msList"></div>
+  </section>
+
+  <!-- ASSUMPTIONS -->
+  <section class="panel" id="tab-assumptions" role="tabpanel" hidden>
+    <div class="note" id="flags"></div>
+
+    <div class="card">
+      <div class="card-head"><div><span class="eyebrow">1</span><h2>Funding rounds and what they buy</h2><p>A scale-up factor of 4× means that capability reaches four times its level before the round, phased in evenly over the ramp period. Factors from the Seed and Series A multiply.</p></div></div>
+      <div class="fields"><div class="field"><label for="f_cash_start">Opening cash, 1 Jan 2027</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_cash_start" data-path="cash.start" step="5"></div><span class="hint">Placeholder: replace with your real balance.</span></div></div>
+      <div class="tbl-wrap"><table><thead><tr><th>Funding event</th><th>Quarter</th><th class="r">Amount ($K)</th></tr></thead><tbody id="fundBody"></tbody></table></div>
+      <div class="tbl-wrap"><table id="roundTbl"></table></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><span class="eyebrow">2</span><h2>Commercial customers: 3DaaS and system sales</h2><p>Qualified leads drive both lines. Most become 3DaaS contracts; a share are system buyers with a 6-month sales cycle. Contract values are drawn at random from your ranges.</p></div>
+        <button type="button" id="reroll">Re-draw contract values</button></div>
+      <div class="fields">
+        <div class="field"><label for="f_com_leads">Qualified leads today</label><div class="inbox"><input type="number" id="f_com_leads" data-path="com.leads" step="1"><span class="u">/ month</span></div></div>
+        <div class="field"><label for="f_com_organic">Organic lead growth, before funding</label><div class="inbox"><input type="number" id="f_com_organic" data-path="com.organic" step="5"><span class="u">% / year</span></div></div>
+        <div class="field"><label for="f_com_cpl">Sales and marketing cost per added lead</label><div class="inbox"><span class="u">$</span><input type="number" id="f_com_cpl" data-path="com.cpl" step="50"></div><span class="hint">Applied to leads above the organic baseline: events, travel, BD staff time, campaigns.</span></div>
+        <div class="field"><label for="f_com_sMin">Small 3DaaS contract, low</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_com_sMin" data-path="com.sMin" step="1"></div></div>
+        <div class="field"><label for="f_com_sMax">Small 3DaaS contract, high</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_com_sMax" data-path="com.sMax" step="1"></div></div>
+        <div class="field"><label for="f_com_lMin">Large 3DaaS contract, low</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_com_lMin" data-path="com.lMin" step="5"></div></div>
+        <div class="field"><label for="f_com_lMax">Large 3DaaS contract, high</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_com_lMax" data-path="com.lMax" step="5"></div></div>
+        <div class="field"><label for="f_com_pLarge">Share of contracts that are large</label><div class="inbox"><input type="number" id="f_com_pLarge" data-path="com.pLarge" step="1"><span class="u">%</span></div><span class="hint">15% gives one or two large contracts in 2027.</span></div>
+        <div class="field"><label for="f_com_seed">Random draw number</label><div class="inbox"><input type="number" id="f_com_seed" data-path="com.seed" step="1"></div></div>
+        <div class="field"><label for="f_com_cogs">Direct 3DaaS cost</label><div class="inbox"><input type="number" id="f_com_cogs" data-path="com.cogs" step="1"><span class="u">% of revenue</span></div></div>
+        <div class="field"><label for="f_com_perMachine">3DaaS revenue per AERIS machine</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_com_perMachine" data-path="com.perMachine" step="25"><span class="u">/ year</span></div></div>
+        <div class="field"><label for="f_com_fleet">3DaaS machines today</label><div class="inbox"><input type="number" id="f_com_fleet" data-path="com.fleet" step="1"></div></div>
+        <div class="field"><label for="f_com_sysShare">Leads that are system buyers</label><div class="inbox"><input type="number" id="f_com_sysShare" data-path="com.sysShare" step="1"><span class="u">%</span></div></div>
+        <div class="field"><label for="f_com_sysClose">System close rate</label><div class="inbox"><input type="number" id="f_com_sysClose" data-path="com.sysClose" step="1"><span class="u">%</span></div><span class="hint">Today: 12 leads × 10% × 15% ≈ 2 systems a year.</span></div>
+        <div class="field"><label for="f_com_sysCycle">System sales cycle</label><div class="inbox"><input type="number" id="f_com_sysCycle" data-path="com.sysCycle" step="1"><span class="u">quarters</span></div><span class="hint">You said six months.</span></div>
+        <div class="field"><label for="f_com_repeat">Repeat business</label><div class="inbox"><input type="number" id="f_com_repeat" data-path="com.repeat" step="5"><span class="u">%</span></div></div>
+      </div>
+      <div class="tbl-wrap"><table id="comYears"></table></div>
+      <div><h3>2027 contract draw</h3><div class="tbl-wrap"><table id="y1Deals"></table></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><span class="eyebrow">3</span><h2>AERIS 1.0 systems and production</h2><p>Prices from quote SC-Q-2026-1023-VV-SYS. Production capacity is shared: customer orders are built first, and spare capacity builds machines for the 3DaaS fleet. Deposits arrive at order; the balance arrives at delivery.</p></div></div>
+      <div class="tbl-wrap"><table id="tierTbl"></table></div>
+      <div class="fields">
+        <div class="field"><label for="f_prod_cap">Production capacity today</label><div class="inbox"><input type="number" id="f_prod_cap" data-path="prod.cap" step="0.25"><span class="u">systems / quarter</span></div></div>
+        <div class="field"><label for="f_prod_lead">Order to delivery, minimum</label><div class="inbox"><input type="number" id="f_prod_lead" data-path="prod.lead" step="1"><span class="u">quarters</span></div></div>
+        <div class="field"><label for="f_prod_deposit">Deposit at order</label><div class="inbox"><input type="number" id="f_prod_deposit" data-path="prod.deposit" step="5"><span class="u">%</span></div></div>
+        <div class="field"><label for="f_prod_svc">Setup, support, add-ons per system</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_prod_svc" data-path="prod.svc" step="1"></div></div>
+        <div class="field"><label for="f_prod_svcMargin">Margin on setup and support</label><div class="inbox"><input type="number" id="f_prod_svcMargin" data-path="prod.svcMargin" step="5"><span class="u">%</span></div></div>
+        <div class="field"><label class="chk"><input type="checkbox" id="f_prod_buyFleet" data-path="prod.buyFleet"> Use spare capacity to build 3DaaS fleet machines</label><span class="hint">Each machine is capex at the Tier 2 build cost.</span></div>
+      </div>
+      <div class="tbl-wrap"><table id="prodYears"></table></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><span class="eyebrow">4</span><h2>Government and prime contracts</h2><p>NASA, DoD and prime opportunities by contract size. Procurement cycles run 6 to 18 months depending on value: bids in one quarter become awards one cycle later, and award value is earned over the performance period. Win rates on medium and large contracts rise after TRL 7 and again after LEO flight heritage.</p></div></div>
+      <div class="tbl-wrap"><table id="govTbl"></table></div>
+      <div class="fields">
+        <div class="field"><label for="f_gov_trlQ">TRL 7 reached</label><select id="f_gov_trlQ" data-path="gov.trlQ"></select></div>
+        <div class="field"><label for="f_gov_trlMult">Win-rate uplift after TRL 7</label><div class="inbox"><input type="number" id="f_gov_trlMult" data-path="gov.trlMult" step="0.05"><span class="u">×</span></div></div>
+        <div class="field"><label for="f_gov_herQ">LEO flight heritage from</label><select id="f_gov_herQ" data-path="gov.herQ"></select></div>
+        <div class="field"><label for="f_gov_herMult">Win-rate uplift after flight heritage</label><div class="inbox"><input type="number" id="f_gov_herMult" data-path="gov.herMult" step="0.05"><span class="u">×</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><span class="eyebrow">5</span><h2>Space programs: AERIS Mini (LEO) and lunar payload (CLPS)</h2><p>AERIS Mini: 18U, 80 kg, 2 kW, commissioned Q4 2027 for a Q4 2028 to Q1 2029 flight; total mission cost $800K to $1.6M plus 30% contingency. Lunar: CLPS delivery providers carry NASA-selected payloads at NASA's cost, or sell space to commercial customers.</p></div></div>
+      <div class="fields">
+        <div class="field"><label for="f_rd_miniTotal">AERIS Mini total mission cost</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_rd_miniTotal" data-path="rd.miniTotal" step="50"></div></div>
+        <div class="field"><label for="f_rd_cont">AERIS Mini contingency</label><div class="inbox"><input type="number" id="f_rd_cont" data-path="rd.cont" step="5"><span class="u">%</span></div></div>
+        <div class="field"><label for="f_rd_miniStart">AERIS Mini start</label><select id="f_rd_miniStart" data-path="rd.miniStart"></select></div>
+      </div>
+      <div class="tbl-wrap"><table id="miniTbl"></table></div>
+      <div class="fields">
+        <div class="field"><label class="chk"><input type="checkbox" id="f_lunar_on" data-path="lunar.on"> Include lunar payload program</label></div>
+        <div class="field"><label for="f_lunar_start">Lunar program start</label><select id="f_lunar_start" data-path="lunar.start"></select><span class="hint">Default: the quarter after the Series A closes.</span></div>
+        <div class="field"><label for="f_lunar_flight">Lunar delivery</label><select id="f_lunar_flight" data-path="lunar.flight"></select></div>
+        <div class="field"><label for="f_lunar_dev">Payload development and qualification</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_lunar_dev" data-path="lunar.dev" step="250"></div><span class="hint">Placeholder. Replace with your engineering estimate.</span></div>
+        <div class="field"><label for="f_lunar_cont">Lunar contingency</label><div class="inbox"><input type="number" id="f_lunar_cont" data-path="lunar.cont" step="5"><span class="u">%</span></div></div>
+        <div class="field"><label for="f_lunar_mass">Payload mass</label><div class="inbox"><input type="number" id="f_lunar_mass" data-path="lunar.mass" step="5"><span class="u">kg</span></div></div>
+        <div class="field"><label class="chk"><input type="checkbox" id="f_lunar_nasa" data-path="lunar.nasa"> Delivery paid by NASA (payload selected through a NASA call)</label><span class="hint">Untick to buy a commercial slot from the lander provider.</span></div>
+        <div class="field"><label for="f_lunar_perKg">Commercial delivery price</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_lunar_perKg" data-path="lunar.perKg" step="50"><span class="u">/ kg</span></div><span class="hint">CLPS task orders have worked out to about $540K to $2.4M per kg of capacity.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><span class="eyebrow">6</span><h2>Core team, contractors, R&amp;D and G&amp;A</h2><p>Your six full-time roles and four contractors. Round-funded hires are set in section 1.</p></div></div>
+      <div class="tbl-wrap"><table><thead><tr><th>Full-time role</th><th class="r">Monthly cost ($K)</th><th>Starts</th></tr></thead><tbody id="roleBody"></tbody></table></div>
+      <div class="fields">
+        <div class="field"><label for="f_staff_burden">Payroll taxes and benefits</label><div class="inbox"><input type="number" id="f_staff_burden" data-path="staff.burden" step="1"><span class="u">% on top</span></div></div>
+        <div class="field"><label for="f_staff_raise">Annual pay increase</label><div class="inbox"><input type="number" id="f_staff_raise" data-path="staff.raise" step="1"><span class="u">%</span></div></div>
+        <div class="field"><label for="f_staff_maxHead">Maximum full-time headcount</label><div class="inbox"><input type="number" id="f_staff_maxHead" data-path="staff.maxHead" step="1"><span class="u">people</span></div><span class="hint">Hard cap. Hiring stops here; system assembly beyond it is assumed to be contract manufacturing inside the build cost.</span></div>
+        <div class="field"><label for="f_staff_rph">Revenue per employee, target</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_staff_rph" data-path="staff.rph" step="25"><span class="u">/ year</span></div><span class="hint">When revenue outgrows the team, the model adds operations, support and delivery staff to stay at or below this ratio. Hardware companies typically run $300K to $500K.</span></div>
+        <div class="field"><label for="f_staff_scaleMo">Monthly cost per revenue-driven hire</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_staff_scaleMo" data-path="staff.scaleMo" step="0.5"></div></div>
+        <div class="field"><label for="f_contr_n">Part-time contractors</label><div class="inbox"><input type="number" id="f_contr_n" data-path="contr.n" step="1"></div></div>
+        <div class="field"><label for="f_contr_perQ">Cost per contractor</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_contr_perQ" data-path="contr.perQ" step="0.5"><span class="u">/ quarter</span></div></div>
+        <div class="field"><label for="f_ga_early">G&amp;A, first 24 months</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_ga_early" data-path="ga.early" step="1"><span class="u">/ quarter</span></div><span class="hint">Legal, finance, accounting, day-to-day.</span></div>
+        <div class="field"><label for="f_ga_later">G&amp;A from month 25</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_ga_later" data-path="ga.later" step="1"><span class="u">/ quarter</span></div></div>
+        <div class="field"><label for="f_ga_climb">G&amp;A annual increase after month 24</label><div class="inbox"><input type="number" id="f_ga_climb" data-path="ga.climb" step="1"><span class="u">%</span></div></div>
+        <div class="field"><label for="f_ga_perHead">Facilities, software, insurance per person</label><div class="inbox"><span class="u">$K</span><input type="number" id="f_ga_perHead" data-path="ga.perHead" step="0.5"><span class="u">/ quarter</span></div><span class="hint">Scales with headcount once rounds add staff.</span></div>
+      </div>
+      <div class="tbl-wrap"><table id="rdYears"></table></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div><span class="eyebrow">7</span><h2>Investor case adjustments</h2><p>Applied on top of the founder plan when "Investor case" is selected.</p></div></div>
+      <div class="fields">
+        <div class="field"><label for="f_inv_cap">Cap on every scale-up factor</label><div class="inbox"><input type="number" id="f_inv_cap" data-path="inv.cap" step="0.5"><span class="u">× per round</span></div></div>
+        <div class="field"><label for="f_inv_close">Round closes later by</label><div class="inbox"><input type="number" id="f_inv_close" data-path="inv.close" step="1"><span class="u">quarters</span></div></div>
+        <div class="field"><label for="f_inv_win">Government win rates</label><div class="inbox"><input type="number" id="f_inv_win" data-path="inv.win" step="5"><span class="u">% of plan</span></div></div>
+        <div class="field"><label for="f_inv_sys">System close rate</label><div class="inbox"><input type="number" id="f_inv_sys" data-path="inv.sys" step="5"><span class="u">% of plan</span></div></div>
+        <div class="field"><label for="f_inv_margin">Gross margin reduction</label><div class="inbox"><input type="number" id="f_inv_margin" data-path="inv.margin" step="1"><span class="u">points</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUATION -->
+  <section class="panel" id="tab-valuation" role="tabpanel" hidden>
+    <div class="card">
+      <div class="card-head">
+        <div><span class="eyebrow" id="valScn"></span><h2>Seed valuation, linked to the plan</h2><p>The VC Method, First Chicago and forward revenue methods read revenue from the operating plan. The other four use the scorecard inputs from the original calculator.</p></div>
+        <div class="fields" style="grid-template-columns:repeat(2,minmax(140px,180px))">
+          <div class="field"><label for="f_val_raise">Seed raise</label><div class="inbox"><span class="u">$M</span><input type="number" id="f_val_raise" data-path="val.raise" step="0.5"></div></div>
+          <div class="field"><label for="f_val_cap">SAFE post-money cap</label><div class="inbox"><span class="u">$M</span><input type="number" id="f_val_cap" data-path="val.cap" step="1"></div></div>
+        </div>
+      </div>
+      <div class="kpis" id="valKpis"></div>
+      <div class="tbl-wrap"><table><thead><tr><th>Method</th><th class="r">Pre-money</th><th class="r">After entity adj.</th><th class="r">Weight</th><th class="r">Contribution</th></tr></thead><tbody id="blendBody"></tbody><tfoot id="blendFoot"></tfoot></table></div>
+      <div class="fields">
+        <div class="field" style="grid-column:1/-1"><label for="f_val_ip">IP structure between the Alberta and Delaware entities</label><select id="f_val_ip" data-path="val.ip"></select><span class="hint">The Alberta entity holds the patent filing and trademark and licenses them to the Delaware entity. Assigning the IP to Delaware removes the haircut.</span></div>
+      </div>
+    </div>
+    <div class="panel" id="methods"></div>
+  </section>
+
+  <footer>
+    <span>Inputs from your materials: AERIS 1.0 tier pricing and payment terms (quote SC-Q-2026-1023-VV-SYS, 23 Oct 2026); 3DaaS rates from quote SC-Q-2026-1023-VV-R1; lead flow, staffing, R&amp;D, G&amp;A, funding rounds and 6 to 18 month procurement cycles from your briefs of 5 Nov 2026. CLPS structure from <a href="https://www.nasa.gov/reference/commercial-lunar-payload-services/" target="_blank" rel="noopener">NASA</a>; per-kg delivery figures derived from CLPS task order values by <a href="https://liveinthefuture.org/stories/lunar-delivery-cost-per-kg-starship-rideshare.html" target="_blank" rel="noopener">Live in the Future (July 2026)</a>.</span>
+    <span>Seed benchmark: PitchBook-NVCA Q1 2026 median US seed pre-money of $18.4M, via <a href="https://hub.causo.ai/guides/seed-round-valuation-benchmark-2026" target="_blank" rel="noopener">Causo</a>. This is a planning model, not an audited projection, 409A valuation or tax advice. Edits are saved in this browser only.</span>
+  </footer>
+</div>
+
+<script>
+const QN=20, Y0=2027, YRS=[2027,2028,2029,2030,2031];
+const qLabel=i=>`Q${(i%4+4)%4+1} ${Y0+Math.floor(i/4)}`;
+const CATS=["R&D","Manufacturing","Hiring","Sales","Funding","Finance"];
+const catCls=c=>"c-"+c.replace(/[^A-Za-z]/g,"");
+
+const DEFAULTS={
+  scenario:"plan", range:"all", tab:"overview",
+  cash:{start:25},
+  funding:[{n:"Seed (SAFE)",q:0,amt:5000,round:"seed"},{n:"Series A",q:9,amt:18000,round:"a"},{n:"Other (bridge, venture debt)",q:4,amt:0,round:""}],
+  rounds:{
+    seed:{name:"Seed",lead:5,prod:4,gov:2.5,ramp:6,hires:12,hireMo:10,capex:750,rd:60},
+    a:{name:"Series A",lead:4,prod:5,gov:2.5,ramp:8,hires:18,hireMo:12,capex:4000,rd:300}},
+  com:{leads:12,organic:10,cpl:750,conv:[8,9,10,11,12],val:[1,1.6,2.1,2.6,3.1],sMin:5,sMax:40,lMin:40,lMax:100,pLarge:15,seed:2027,cogs:30,perMachine:750,fleet:1,sysShare:10,sysClose:15,sysCycle:2,repeat:30},
+  prod:{price:[135,500,560],mix:[10,50,40],margin:[40,45,52,58,62],cap:1,lead:1,deposit:50,svc:25,svcMargin:50,buyFleet:true},
+  gov:{trlQ:0,trlMult:1.25,herQ:8,herMult:1.5,tiers:[
+    {n:"Small: SBIR/STTR Phase I, grants, small task orders",val:150,bids:10,win:6,cycle:2,perf:2,cost:40,mature:false},
+    {n:"Medium: Phase II, OTA prototypes, prime subcontracts",val:1200,bids:1,win:12,cycle:4,perf:6,cost:50,mature:true},
+    {n:"Large: programs of record, prime production, NASA payload awards",val:8000,bids:0.25,win:10,cycle:6,perf:8,cost:60,mature:true}]},
+  staff:{roles:[
+    {n:"CEO and Program Manager",mo:6,start:0},{n:"Technical Lead, Systems",mo:8,start:0},{n:"Mechanical and Systems Engineer",mo:7,start:0},
+    {n:"Aerospace Engineer",mo:6,start:0},{n:"Manufacturing Technician",mo:4,start:0},{n:"BD and Operations Coordinator",mo:3,start:0}],burden:15,raise:5,rph:450,scaleMo:8,maxHead:40},
+  contr:{n:4,perQ:4},
+  rd:{core:[20,25,30,35,40],miniTotal:1200,cont:30,miniStart:3,miniPct:[10,15,15,20,25,15]},
+  lunar:{on:true,start:10,flight:19,dev:6000,cont:30,mass:30,nasa:true,perKg:900},
+  ga:{early:10,later:25,climb:10,perHead:3},
+  inv:{cap:2.5,close:1,win:70,sys:70,margin:5},
+  planned:[
+    {q:0,c:"Sales",t:"Publish a NASA and DoD capture plan naming target programs, buyers and contract vehicles"},
+    {q:5,c:"R&D",t:"AERIS Mini design review; flight qualification campaign begins"},
+    {q:7,c:"R&D",t:"AERIS Mini LEO flight window opens (Q4 2028 to Q1 2029)"},
+    {q:8,c:"R&D",t:"AERIS Mini flight window closes; return and post-flight analysis"},
+    {q:8,c:"Funding",t:"Series A data room: flight results, backlog, government pipeline, unit economics"}],
+  val:{raise:5,cap:25,ip:2,aDil:20,weights:{sc:25,bk:10,rfs:15,vc:20,fc:15,fwd:10,cd:5},
+    sc:{bench:15,f:[{n:"Strength of team",w:30,r:100},{n:"Size of opportunity",w:25,r:115},{n:"Product and technology",w:15,r:125},{n:"Competitive environment",w:10,r:90},{n:"Partnerships and sales channels",w:10,r:120},{n:"Need for additional investment",w:5,r:80},{n:"Other (certifications, awards)",w:5,r:105}]},
+    bk:{cap:2.5,i:[{n:"Sound idea",v:2},{n:"Prototype (TRL 6 hardware)",v:2.25},{n:"Quality management team",v:1.5},{n:"Strategic relationships",v:2},{n:"Product rollout or sales",v:1}]},
+    rfs:{base:15,step:5,r:[{n:"Management",s:0},{n:"Stage of the business",s:1},{n:"Legislation and political",s:0},{n:"Manufacturing",s:-1},{n:"Sales and marketing",s:1},{n:"Funding and capital raising",s:-1},{n:"Competition",s:-1},{n:"Technology",s:1},{n:"Litigation",s:-1},{n:"International",s:-1},{n:"Reputation",s:1},{n:"Potential lucrative exit",s:1}]},
+    vc:{mult:4,roi:10,ret:50},
+    fc:{disc:50,bearRev:5,bearM:2,baseM:4,bullM:6,p:[35,45,20]},
+    fwd:{mult:3},
+    cd:{hw:350,labor:2475,sw:250,ip:40}}
+};
+const IP_OPTS=[{l:"IP assigned to the Delaware entity",h:0},{l:"Exclusive, perpetual, royalty-free license",h:10},{l:"Exclusive license, royalty-bearing or terminable",h:20},{l:"Non-exclusive or undocumented license",h:40}];
+const METHODS=[{k:"sc",n:"Scorecard"},{k:"bk",n:"Berkus"},{k:"rfs",n:"Risk Factor Summation"},{k:"vc",n:"VC Method (plan-linked)"},{k:"fc",n:"First Chicago (plan-linked)"},{k:"fwd",n:"Forward revenue (plan-linked)"},{k:"cd",n:"Cost to duplicate"}];
+
+const KEY="spacecopy-opplan-v4";
+const clone=o=>JSON.parse(JSON.stringify(o));
+function merge(a,b){ if(Array.isArray(a)&&Array.isArray(b)) return b; for(const k in b){ if(!(k in a)) continue; if(a[k]&&typeof a[k]==="object"&&!Array.isArray(a[k])&&b[k]&&typeof b[k]==="object") merge(a[k],b[k]); else a[k]=b[k]; } return a; }
+let S=clone(DEFAULTS);
+try{ const raw=localStorage.getItem(KEY); if(raw) S=merge(clone(DEFAULTS),JSON.parse(raw)); }catch(e){}
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+const $=id=>document.getElementById(id);
+const getP=p=>p.split(".").reduce((o,k)=>o==null?o:o[k],S);
+const setP=(p,v)=>{ const ks=p.split("."); const l=ks.pop(); ks.reduce((o,k)=>o[k],S)[l]=v; };
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fm=k=>{ if(!isFinite(k)) return "n/a"; const n=k<0,a=Math.abs(k); let s; if(a>=1000) s="$"+(a/1000).toFixed(a>=100000?0:a>=10000?1:2)+"M"; else s="$"+Math.round(a)+"K"; return (n?"−":"")+s; };
+const fk=k=>(k<-0.5?"−":"")+Math.round(Math.abs(k)).toLocaleString("en-US");
+const fUSD=k=>"$"+Math.round(k*1000).toLocaleString("en-US");
+const fM=v=>{ if(!isFinite(v)) return "n/a"; const n=v<0,a=Math.abs(v); const s=a>=1?"$"+a.toFixed(a>=100?0:a>=10?1:2)+"M":"$"+Math.round(a*1000)+"K"; return (n?"−":"")+s; };
+const pct=v=>isFinite(v)?(v*100).toFixed(1)+"%":"n/a";
+const n1=v=>(Math.round(v*10)/10).toLocaleString("en-US");
+function rng(seed){ let a=seed>>>0; return ()=>{ a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+
+/* ================= ENGINE ================= */
+function compute(sc){
+  const inv=sc==="investor", I=S.inv, C=S.com, P=S.prod, G=S.gov;
+  const z=()=>Array(QN).fill(0);
+  const R={leads:z(),deals:z(),d3dem:z(),d3:z(),d3cogs:z(),unserved:z(),sysOrders:z(),units:z(),backlog:z(),cap:z(),prod:z(),prodCogs:z(),svc:z(),svcCogs:z(),
+    gov:z(),govCost:z(),govBids:z(),govAwards:z(),govAwardCnt:z(),govByTier:[z(),z(),z()],
+    staff:z(),scaleHead:z(),capped:z(),contr:z(),sm:z(),ga:z(),over:z(),core:z(),mini:z(),lunar:z(),fleetCapex:z(),prodCapex:z(),capex:z(),built:z(),fleet:z(),head:z(),roundHead:z(),funding:z(),
+    receipts:z(),buildCash:z(),rev:z(),cogs:z(),gp:z(),opex:z(),ebitda:z(),opcf:z(),net:z(),cash:z(),custCum:z()};
+  // rounds
+  const rounds=S.funding.filter(f=>f.round&&S.rounds[f.round]&&+f.amt>0).map(f=>({key:f.round,amt:+f.amt,n:f.n,q:Math.min(QN-1,(+f.q)+(inv?I.close:0)),c:S.rounds[f.round]}));
+  R.rounds=rounds;
+  const F=(r,k)=>inv?Math.min(r.c[k],I.cap):r.c[k];
+  const fac=(q,k)=>rounds.reduce((m,r)=>{ if(q<r.q) return m; const t=Math.min(1,(q-r.q+1)/Math.max(1,r.c.ramp)); return m*(1+(F(r,k)-1)*t); },1);
+  const ramp=(q,r)=>q<r.q?0:Math.min(1,(q-r.q+1)/Math.max(1,r.c.ramp));
+  // prices and costs
+  const ms=P.mix.reduce((a,b)=>a+b,0)||1, avgPrice=P.mix.reduce((a,m,i)=>a+m*P.price[i],0)/ms;
+  const marginY=y=>P.margin[Math.max(0,Math.min(y,4))]-(inv?I.margin:0);
+  const unitCost=y=>avgPrice*(1-marginY(y)/100), t2Cost=y=>P.price[1]*(1-marginY(y)/100);
+  R.avgPrice=avgPrice;
+  // commercial leads, 3DaaS demand, system orders
+  const r=rng(C.seed); const base=q=>C.leads*Math.pow(1+C.organic/100,q/4);
+  const leadsAt=q=>base(q)*(q<0?1:fac(q,"lead"));
+  let dAcc=0, dPrev=0; R.y1=[];
+  for(let q=0;q<QN;q++){
+    const y=Math.floor(q/4); R.leads[q]=leadsAt(q);
+    dAcc+=R.leads[q]*3*C.conv[y]/100; const n=Math.round(dAcc)-dPrev; dPrev+=n; R.deals[q]=n;
+    let sum=0; for(let i=0;i<n;i++){ const big=r()<C.pLarge/100, u=r(); const v=(big? C.lMin+(C.lMax-C.lMin)*u : C.sMin+(C.sMax-C.sMin)*u*u)*C.val[y]; sum+=v; if(q<4) R.y1.push({q,v:Math.round(v*10)/10,big}); }
+    R.d3dem[q]=sum;
+  }
+  const close=C.sysClose/100*(inv?I.sys/100:1);
+  let oAcc=0,oPrev=0; const orders=Array(QN).fill(0); let pre=0;
+  for(let qL=-C.sysCycle;qL<QN;qL++){ oAcc+=leadsAt(qL)*3*C.sysShare/100*close; const n=Math.round(oAcc)-oPrev; oPrev+=n; const qo=qL+C.sysCycle; if(qo<0) continue; if(qo<C.sysCycle&&qL<0) { /* orders from 2026 leads */ } if(qo<QN) orders[qo]+=n; }
+  R.sysOrders=orders;
+  // production: customer backlog first, spare capacity to fleet
+  const queue=[]; let capAcc=0, fleet=C.fleet;
+  for(let q=0;q<QN;q++){
+    const y=Math.floor(q/4);
+    if(orders[q]) queue.push({q,n:orders[q]});
+    R.cap[q]=P.cap*fac(q,"prod");
+    const capInt=Math.floor(capAcc+R.cap[q]+1e-9)-Math.floor(capAcc+1e-9); capAcc+=R.cap[q];
+    R.fleet[q]=fleet;
+    let left=capInt, del=0;
+    for(const o of queue){ if(left<=0) break; if(o.q>q-P.lead||o.n<=0) continue; const k=Math.min(o.n,left); o.n-=k; left-=k; del+=k; }
+    R.units[q]=del; R.backlog[q]=queue.reduce((a,o)=>a+o.n,0);
+    // 3DaaS served by fleet available this quarter
+    const capRev=fleet*C.perMachine/4; R.d3[q]=Math.min(R.d3dem[q],capRev); R.unserved[q]=R.d3dem[q]-R.d3[q];
+    // build fleet for next quarter's demand
+    if(P.buyFleet && left>0){ const nextDem=q+1<QN?R.d3dem[q+1]:R.d3dem[q]*1.1; const need=Math.ceil(nextDem*4/Math.max(C.perMachine,1)); const add=Math.max(0,Math.min(left,need-fleet)); if(add>0){ R.built[q]=add; R.fleetCapex[q]=add*t2Cost(y); fleet+=add; } }
+    const cost=unitCost(y), dep=P.deposit/100;
+    R.prod[q]=del*avgPrice; R.prodCogs[q]=del*cost; R.svc[q]=del*P.svc; R.svcCogs[q]=del*P.svc*(1-P.svcMargin/100);
+    R.receipts[q]+=orders[q]*avgPrice*dep + del*avgPrice*(1-dep);
+    R.buildCash[Math.max(0,q-1)]+=del*cost*0.5; R.buildCash[q]+=del*cost*0.5;
+    R.d3cogs[q]=R.d3[q]*C.cogs/100;
+  }
+  // government and primes
+  const mat=q=>(q>G.trlQ?G.trlMult:1)*(q>G.herQ?G.herMult:1);
+  G.tiers.forEach((t,ti)=>{
+    for(let qb=-t.cycle;qb<QN;qb++){
+      const bids=t.bids*(qb<0?1:fac(qb,"gov")); if(qb>=0) R.govBids[qb]+=bids;
+      const qa=qb+t.cycle; if(qa<0||qa>=QN) continue;
+      const w=Math.min(0.95,t.win/100*(t.mature?mat(qa):1)*(inv?I.win/100:1));
+      const cnt=bids*w, ev=cnt*t.val; R.govAwards[qa]+=ev; R.govAwardCnt[qa]+=cnt;
+      for(let k=0;k<t.perf;k++){ const qq=qa+k; if(qq<QN){ const v=ev/t.perf; R.gov[qq]+=v; R.govByTier[ti][qq]+=v; R.govCost[qq]+=v*t.cost/100; } }
+    }
+  });
+  // people and operating costs
+  const St=S.staff;
+  for(let q=0;q<QN;q++){
+    const y=Math.floor(q/4), escl=Math.pow(1+St.raise/100,y);
+    const active=St.roles.filter(x=>q>=x.start);
+    let pay=active.reduce((a,x)=>a+x.mo*3,0), rh=0, room=Math.max(0,St.maxHead-active.length);
+    rounds.forEach(rd=>{ const h=Math.min(room,Math.round(rd.c.hires*ramp(q,rd))); room-=h; rh+=h; pay+=h*rd.c.hireMo*3; R.core[q]+= q>=rd.q?rd.c.rd:0; });
+    const req=(R.d3[q]+R.prod[q]+R.svc[q]+R.gov[q])*4/Math.max(St.rph,1); const want=Math.max(0,Math.ceil(req-(active.length+rh))); const sh=Math.min(room,want);
+    R.capped[q]=want>sh; pay+=sh*St.scaleMo*3; R.scaleHead[q]=sh;
+    R.staff[q]=pay*(1+St.burden/100)*escl; R.roundHead[q]=rh; R.head[q]=active.length+rh+sh;
+    R.contr[q]=S.contr.n*S.contr.perQ;
+    R.core[q]+=S.rd.core[y];
+    R.sm[q]=Math.max(0,R.leads[q]-base(q))*3*C.cpl/1000;
+    R.ga[q]= q<8 ? S.ga.early : S.ga.later*Math.pow(1+S.ga.climb/100,y-2);
+    R.over[q]=R.head[q]*S.ga.perHead;
+    const k=q-S.rd.miniStart; if(k>=0&&k<S.rd.miniPct.length) R.mini[q]=S.rd.miniTotal*(1+S.rd.cont/100)*S.rd.miniPct[k]/100;
+  }
+  rounds.forEach(rd=>{ [0,1].forEach(k=>{ if(rd.q+k<QN) R.prodCapex[rd.q+k]+=rd.c.capex/2; }); });
+  // lunar
+  const L=S.lunar;
+  if(L.on && L.flight>L.start){
+    const span=Math.max(1,Math.min(L.flight,QN)-L.start); const dev=L.dev*(1+L.cont/100);
+    for(let q=L.start;q<Math.min(L.flight,QN);q++) R.lunar[q]+=dev/span;
+    if(!L.nasa){ const d=L.mass*L.perKg; [[L.flight-4,0.5],[L.flight-1,0.5]].forEach(([q,f])=>{ const qq=Math.max(L.start,Math.min(QN-1,q)); R.lunar[qq]+=d*f; }); }
+  }
+  S.funding.forEach(f=>{ const q=(+f.q)+(inv&&f.round?I.close:0); if(q>=0&&q<QN) R.funding[q]+=+f.amt||0; });
+  // roll-up
+  let cash=S.cash.start, cust=0;
+  for(let q=0;q<QN;q++){
+    R.rev[q]=R.d3[q]+R.prod[q]+R.svc[q]+R.gov[q];
+    R.cogs[q]=R.d3cogs[q]+R.prodCogs[q]+R.svcCogs[q]+R.govCost[q];
+    R.gp[q]=R.rev[q]-R.cogs[q];
+    R.opex[q]=R.staff[q]+R.contr[q]+R.sm[q]+R.ga[q]+R.over[q]+R.core[q]+R.mini[q]+R.lunar[q];
+    R.ebitda[q]=R.gp[q]-R.opex[q];
+    R.capex[q]=R.fleetCapex[q]+R.prodCapex[q];
+    R.receipts[q]+=R.d3[q]+R.svc[q]+R.gov[q];
+    R.opcf[q]=R.receipts[q]-R.d3cogs[q]-R.svcCogs[q]-R.govCost[q]-R.buildCash[q]-R.opex[q];
+    R.net[q]=R.opcf[q]-R.capex[q]+R.funding[q];
+    cash+=R.net[q]; R.cash[q]=cash;
+    cust+=(R.deals[q]+R.sysOrders[q])*(1-C.repeat/100)+R.govAwardCnt[q]; R.custCum[q]=cust;
+  }
+  const sustained=a=>{ for(let q=0;q<QN;q++) if(a.slice(q).every(v=>v>=0)) return q; return null; };
+  R.be=sustained(R.ebitda); R.cfp=sustained(R.opcf.map((v,q)=>v-R.capex[q]));
+  R.minCash=Math.min(...R.cash); R.minQ=R.cash.indexOf(R.minCash);
+  R.c20=R.custCum.findIndex(v=>v>=20);
+  R.capBind=R.unserved.findIndex(v=>v>1); R.headCapQ=R.capped.findIndex(v=>v);
+  R.fundTotal=R.funding.reduce((a,b)=>a+b,0);
+  R.peakBurn=Math.max(0,...R.opcf.map((v,q)=>-(v-R.capex[q])));
+  R.firstLarge=(()=>{ let c=0; for(let q=0;q<QN;q++){ c+=G.tiers[2]? 0:0; } return -1; })();
+  // expected cumulative large-tier awards ≥ 1
+  { const t=G.tiers[2]; let c=0; R.firstLarge=-1; for(let q=0;q<QN;q++){ const qb=q-t.cycle; const bids=t.bids*(qb<0?1:fac(qb,"gov")); c+=bids*Math.min(0.95,t.win/100*mat(q)*(inv?I.win/100:1)); if(c>=1){ R.firstLarge=q; break; } } }
+  const ttm=q=>R.rev.slice(Math.max(0,q-3),q+1).reduce((a,b)=>a+b,0);
+  rounds.forEach(rd=>{ rd.ttm=rd.q>0?ttm(rd.q-1):0; rd.cashBefore=rd.q>0?R.cash[rd.q-1]:S.cash.start; const end=Math.min(QN-1,rd.q+rd.c.ramp-1); rd.leadsEnd=R.leads[end]; rd.capEnd=R.cap[end]; rd.headEnd=R.head[end]; rd.endQ=end;
+    rd.spend={hires:0,capex:rd.c.capex,sm:0,rd:0}; for(let q=rd.q;q<Math.min(QN,rd.q+8);q++){ rd.spend.sm+=R.sm[q]; rd.spend.rd+=rd.c.rd; } });
+  const sumY=(a,y)=>a.slice(y*4,y*4+4).reduce((s,v)=>s+v,0);
+  R.ann=YRS.map((yr,y)=>({yr,rev:sumY(R.rev,y),d3:sumY(R.d3,y),prod:sumY(R.prod,y),svc:sumY(R.svc,y),gov:sumY(R.gov,y),cogs:sumY(R.cogs,y),gp:sumY(R.gp,y),opex:sumY(R.opex,y),ebitda:sumY(R.ebitda,y),capex:sumY(R.capex,y),cash:R.cash[y*4+3],units:sumY(R.units,y),orders:sumY(R.sysOrders,y),deals:sumY(R.deals,y),head:R.head[y*4+3],fleet:R.fleet[y*4+3],leads:R.leads[y*4+3],unserved:sumY(R.unserved,y),govAw:sumY(R.govAwards,y),backlog:R.backlog[y*4+3],margin:marginY(y),unitCost:unitCost(y)}));
+  return R;
+}
+
+/* ================= VALUATION ================= */
+function valuation(A,B){
+  const V=S.val, r={};
+  r.sc=V.sc.bench*V.sc.f.reduce((a,f)=>a+f.w/100*f.r/100,0); r.scW=V.sc.f.reduce((a,f)=>a+f.w,0);
+  r.bk=V.bk.i.reduce((a,f)=>a+Math.min(Math.max(f.v,0),V.bk.cap),0);
+  r.pts=V.rfs.r.reduce((a,x)=>a+x.s,0); r.step=V.rfs.base*V.rfs.step/100; r.rfs=V.rfs.base+r.pts*r.step;
+  r.y5=A.ann[4].rev/1000; r.exit=r.y5*V.vc.mult; r.post=r.exit*(V.vc.ret/100)/V.vc.roi; r.vc=r.post-V.raise; r.reqRev=V.cap*V.vc.roi/(V.vc.ret/100)/V.vc.mult;
+  r.fcS=[{n:"Bear (input)",rev:V.fc.bearRev,m:V.fc.bearM,p:V.fc.p[0]},{n:"Base (investor case 2031)",rev:B.investor.ann[4].rev/1000,m:V.fc.baseM,p:V.fc.p[1]},{n:"Bull (founder plan 2031)",rev:B.plan.ann[4].rev/1000,m:V.fc.bullM,p:V.fc.p[2]}];
+  r.fcP=V.fc.p.reduce((a,b)=>a+b,0); r.fcEV=r.fcS.reduce((a,s)=>a+s.p/100*s.rev*s.m,0); r.df=Math.pow(1+V.fc.disc/100,5); r.fc=r.fcEV/r.df;
+  r.n12=A.rev.slice(0,4).reduce((a,b)=>a+b,0)/1000; r.fwd=r.n12*V.fwd.mult;
+  r.cd=(V.cd.hw+V.cd.labor+V.cd.sw+V.cd.ip)/1000;
+  r.h=IP_OPTS[V.ip].h/100; r.adj=k=>r[k]*(1-r.h);
+  r.wsum=METHODS.reduce((a,m)=>a+(+V.weights[m.k]||0),0);
+  r.blend=r.wsum?METHODS.reduce((a,m)=>a+V.weights[m.k]*r[m.k],0)/r.wsum:0;
+  r.pre=r.blend*(1-r.h); r.capPre=V.cap-V.raise;
+  const vals=METHODS.filter(m=>V.weights[m.k]>0).map(m=>r.adj(m.k)); r.lo=Math.min(...vals); r.hi=Math.max(...vals);
+  return r;
+}
+
+/* ================= INPUT BUILDERS ================= */
+function qOpts(sel){ return [...Array(QN).keys()].map(i=>`<option value="${i}" ${i==sel?"selected":""}>${qLabel(i)}</option>`).join(""); }
+function numIn(path,step,label,w){ return `<input type="number" id="f_${path.replace(/\./g,"_")}" data-path="${path}" step="${step||"any"}" aria-label="${esc(label)}" value="${getP(path)}"${w?` style="width:${w}px"`:""}>`; }
+function yearTable(id,rows){
+  $(id).innerHTML=`<thead><tr><th></th>${YRS.map(y=>`<th class="r">${y}</th>`).join("")}</tr></thead><tbody>`+
+    rows.map(([path,label,unit])=>`<tr><td>${label}${unit?` <span class="muted">(${unit})</span>`:""}</td>${YRS.map((y,i)=>`<td class="r">${numIn(path+"."+i,"any",label+" "+y)}</td>`).join("")}</tr>`).join("")+`</tbody>`;
+}
+function buildInputs(){
+  document.querySelectorAll('#tab-assumptions input[data-path], #tab-valuation input[data-path]').forEach(el=>{ if(el.closest("table")) return; const v=getP(el.dataset.path); if(el.type==="checkbox") el.checked=!!v; else el.value=v; });
+  ["f_gov_trlQ","f_gov_herQ","f_rd_miniStart","f_lunar_start","f_lunar_flight"].forEach(id=>{ const el=$(id); el.innerHTML=qOpts(getP(el.dataset.path)); });
+  $("fundBody").innerHTML=S.funding.map((f,i)=>`<tr><td><input type="text" data-path="funding.${i}.n" data-kind="text" aria-label="Funding event name" value="${esc(f.n)}"></td><td><select data-path="funding.${i}.q" aria-label="Quarter">${qOpts(f.q)}</select></td><td class="r">${numIn(`funding.${i}.amt`,250,"Amount")}</td></tr>`).join("");
+  const rk=["seed","a"], rows=[["lead","Commercial lead generation","× scale-up",0.5],["prod","Production capacity","× scale-up",0.5],["gov","Government and prime bids pursued","× scale-up",0.5],["ramp","Ramp to full effect","quarters",1],["hires","Full-time hires funded","people",1],["hireMo","Average cost per hire","$K / month",0.5],["capex","Production line and facility capex","$K",50],["rd","Added R&D budget","$K / quarter",10]];
+  $("roundTbl").innerHTML=`<thead><tr><th>What each round buys</th>${rk.map(k=>`<th class="r">${S.rounds[k].name}</th>`).join("")}</tr></thead><tbody>`+rows.map(([k,l,u,st])=>`<tr><td>${l} <span class="muted">(${u})</span></td>${rk.map(r=>`<td class="r">${numIn(`rounds.${r}.${k}`,st,l+" "+r)}</td>`).join("")}</tr>`).join("")+`</tbody>`;
+  yearTable("comYears",[["com.conv","Lead to 3DaaS contract conversion","%"],["com.val","Average 3DaaS contract value vs. 2027","×"]]);
+  $("tierTbl").innerHTML=`<thead><tr><th>Tier</th><th class="r">Price ($K)</th><th class="r">Share of units (%)</th></tr></thead><tbody>`+
+    ["Tier 1: Standalone printing system","Tier 2: Printer + MBU","Tier 3: Printer + MBU + post-processing"].map((n,i)=>`<tr><td>${n}</td><td class="r">${numIn("prod.price."+i,5,n+" price")}</td><td class="r">${numIn("prod.mix."+i,5,n+" share")}</td></tr>`).join("")+`</tbody>`;
+  yearTable("prodYears",[["prod.margin","System gross margin","%"]]);
+  $("govTbl").innerHTML=`<thead><tr><th>Contract tier</th><th class="r">Avg value ($K)</th><th class="r">Bids / quarter today</th><th class="r">Win rate (%)</th><th class="r">Bid to award (quarters)</th><th class="r">Performance (quarters)</th><th class="r">Direct cost (%)</th></tr></thead><tbody>`+
+    S.gov.tiers.map((t,i)=>`<tr><td class="wide">${esc(t.n)}${t.mature?' <span class="muted">· uplift applies</span>':""}</td>${["val","bids","win","cycle","perf","cost"].map(k=>`<td class="r">${numIn(`gov.tiers.${i}.${k}`,k==="bids"?0.25:k==="val"?50:1,t.n+" "+k,74)}</td>`).join("")}</tr>`).join("")+`</tbody>`;
+  $("roleBody").innerHTML=S.staff.roles.map((x,i)=>`<tr><td><input type="text" data-path="staff.roles.${i}.n" data-kind="text" aria-label="Role name" value="${esc(x.n)}"></td><td class="r">${numIn(`staff.roles.${i}.mo`,0.5,"Monthly cost")}</td><td><select data-path="staff.roles.${i}.start" aria-label="Start quarter">${qOpts(x.start)}</select></td></tr>`).join("");
+  yearTable("rdYears",[["rd.core","Core AERIS R&D before round budgets","$K / quarter"]]);
+  $("miniTbl").innerHTML=`<thead><tr><th>AERIS Mini spend</th>${S.rd.miniPct.map((p,k)=>`<th class="r" id="mh_${k}"></th>`).join("")}<th class="r">Total</th></tr></thead><tbody><tr><td>Share of budget (%)</td>${S.rd.miniPct.map((p,k)=>`<td class="r">${numIn("rd.miniPct."+k,5,"Share "+(k+1),66)}</td>`).join("")}<td class="n" id="msum"></td></tr><tr><td>Spend incl. contingency</td>${S.rd.miniPct.map((p,k)=>`<td class="n" id="ms_${k}"></td>`).join("")}<td class="n" id="mtot"></td></tr></tbody>`;
+  $("f_val_ip").innerHTML=IP_OPTS.map((o,i)=>`<option value="${i}" ${i==S.val.ip?"selected":""}>${o.l} (${o.h}% haircut)</option>`).join("");
+  buildMethods(); buildMsForm();
+}
+function miniTable(){
+  const mt=S.rd.miniTotal*(1+S.rd.cont/100), sum=S.rd.miniPct.reduce((a,b)=>a+b,0);
+  S.rd.miniPct.forEach((p,k)=>{ const q=S.rd.miniStart+k; $("mh_"+k).textContent=q<QN?qLabel(q):"After plan"; $("ms_"+k).textContent=fm(mt*p/100); });
+  $("msum").innerHTML=`${sum}% ${sum!==100?'<span class="pill bad">should be 100%</span>':""}`; $("mtot").textContent=fm(mt*sum/100);
+}
+function buildMethods(){
+  const V=S.val;
+  const sec=(k,title,desc,body)=>`<details class="method"><summary><span><span class="eyebrow">${title}</span><br><span class="muted" style="font-size:13.5px">${desc}</span></span><span class="big" id="mv_${k}"></span></summary><div class="inner">${body}</div></details>`;
+  const fld=(path,label,unit,hint,step)=>{ const id="f_"+path.replace(/\./g,"_"); const pre=unit&&unit.startsWith("$")?`<span class="u">${unit}</span>`:""; const post=unit&&!unit.startsWith("$")?`<span class="u">${unit}</span>`:""; return `<div class="field"><label for="${id}">${label}</label><div class="inbox">${pre}<input type="number" id="${id}" data-path="${path}" step="${step||"any"}" value="${getP(path)}">${post}</div>${hint?`<span class="hint">${hint}</span>`:""}</div>`; };
+  $("methods").innerHTML=
+   sec("sc","Scorecard","Median comparable seed pre-money, adjusted factor by factor.",`<div class="fields">${fld("val.sc.bench","Benchmark seed pre-money","$M","PitchBook-NVCA Q1 2026 US median is $18.4M; discounted for pre-revenue hardware.",0.5)}</div><div class="tbl-wrap"><table><thead><tr><th>Factor</th><th class="r">Weight (%)</th><th class="r">Ratio (%)</th></tr></thead><tbody>${V.sc.f.map((f,i)=>`<tr><td>${f.n}</td><td class="r">${numIn(`val.sc.f.${i}.w`,1,f.n+" weight")}</td><td class="r">${numIn(`val.sc.f.${i}.r`,5,f.n+" ratio")}</td></tr>`).join("")}</tbody></table></div><div id="scNote"></div>`)+
+   sec("bk","Berkus","Five milestones, each capped.",`<div class="fields">${fld("val.bk.cap","Cap per milestone","$M","",0.25)}</div><div class="tbl-wrap"><table><thead><tr><th>Milestone</th><th class="r">Value ($M)</th></tr></thead><tbody>${V.bk.i.map((f,i)=>`<tr><td>${f.n}</td><td class="r">${numIn(`val.bk.i.${i}.v`,0.25,f.n)}</td></tr>`).join("")}</tbody></table></div>`)+
+   sec("rfs","Risk Factor Summation","Twelve risks scored from −2 to +2.",`<div class="fields">${fld("val.rfs.base","Base pre-money","$M","",0.5)}${fld("val.rfs.step","Step per point","% of base","",0.5)}</div><div class="tbl-wrap"><table><thead><tr><th>Risk</th><th>Score</th></tr></thead><tbody>${V.rfs.r.map((x,i)=>`<tr><td>${x.n}</td><td><div class="score" role="group" aria-label="${x.n}">${[-2,-1,0,1,2].map(v=>`<button type="button" data-risk="${i}" data-val="${v}" aria-pressed="${x.s===v}">${v>0?"+"+v:v}</button>`).join("")}</div></td></tr>`).join("")}</tbody></table></div>`)+
+   sec("vc","VC Method (plan-linked)","Exit value from 2031 plan revenue, worked back to today.",`<div class="fields">${fld("val.vc.mult","Exit EV / revenue","×","",0.5)}${fld("val.vc.roi","Seed target return","×","",1)}${fld("val.vc.ret","Seed ownership kept after later rounds","%","The Series A alone dilutes the seed by about 20%.",5)}</div><div class="note" id="vcNote"></div>`)+
+   sec("fc","First Chicago (plan-linked)","Bear input, base from the investor case, bull from the founder plan, discounted 5 years.",`<div class="fields">${fld("val.fc.disc","Venture discount rate","%","",5)}${fld("val.fc.bearRev","Bear case 2031 revenue","$M","",1)}${fld("val.fc.bearM","Bear multiple","×","",0.5)}${fld("val.fc.baseM","Base multiple","×","",0.5)}${fld("val.fc.bullM","Bull multiple","×","",0.5)}${fld("val.fc.p.0","Bear probability","%","",5)}${fld("val.fc.p.1","Base probability","%","",5)}${fld("val.fc.p.2","Bull probability","%","",5)}</div><div class="tbl-wrap"><table id="fcTbl"></table></div>`)+
+   sec("fwd","Forward revenue (plan-linked)","Next four quarters of plan revenue × multiple.",`<div class="fields">${fld("val.fwd.mult","Forward revenue multiple","×","",0.5)}</div><div id="fwdNote" class="muted" style="font-size:13.5px"></div>`)+
+   sec("cd","Cost to duplicate","Floor value: what a competitor would spend to rebuild AERIS to TRL 6.",`<div class="fields">${fld("val.cd.hw","Hardware","$K","",25)}${fld("val.cd.labor","Engineering labor to date","$K","",25)}${fld("val.cd.sw","Software stack","$K","",25)}${fld("val.cd.ip","IP filings","$K","",5)}</div>`);
+  $("blendBody").innerHTML=METHODS.map(m=>`<tr><td>${m.n}</td><td class="n" id="bv_${m.k}"></td><td class="n" id="ba_${m.k}"></td><td class="r">${numIn(`val.weights.${m.k}`,5,m.n+" weight",70)}</td><td class="n" id="bc_${m.k}"></td></tr>`).join("");
+}
+
+/* ================= MILESTONES ================= */
+let msFilter=new Set(CATS);
+function buildMsForm(){ $("msQ").innerHTML=qOpts(0); $("msC").innerHTML=CATS.map(c=>`<option>${c}</option>`).join(""); $("msFilters").innerHTML=CATS.map(c=>`<button type="button" data-cat="${c}" aria-pressed="${msFilter.has(c)}">${c}</button>`).join(""); }
+function autoMs(R){
+  const out=[], add=(q,c,t)=>{ if(q!=null&&q>=0&&q<QN) out.push({q,c,t,auto:true}); };
+  R.rounds.forEach(rd=>{
+    add(rd.q,"Funding",`${rd.n} closes: ${fm(rd.amt)}. Trailing 12-month revenue at close: ${fm(rd.ttm)}`);
+    add(rd.q,"Hiring",`${rd.n} hiring plan starts: ${rd.c.hires} full-time hires over ${rd.c.ramp} quarters`);
+    add(rd.q,"Manufacturing",`${rd.n} production investment: ${fm(rd.c.capex)} in line and facility capex`);
+    add(rd.endQ,"Sales",`${rd.n} ramp complete: ${Math.round(rd.leadsEnd)} qualified leads/month, ${n1(rd.capEnd)} systems/quarter capacity, ${rd.headEnd} full-time staff`);
+  });
+  if(R.funding.some((v,q)=>v>0)) S.funding.forEach(f=>{ if(!f.round&&+f.amt>0) add(+f.q,"Funding",`${f.n}: ${fm(+f.amt)}`); });
+  add(S.gov.trlQ,"R&D","AERIS reaches TRL 7 (target: March 2027); medium and large government win rates step up");
+  add(S.gov.herQ,"R&D","LEO flight heritage established; government win rates step up again");
+  add(S.rd.miniStart,"R&D",`AERIS Mini commissioned: 18U, 80 kg, 2 kW payload; budget ${fm(S.rd.miniTotal*(1+S.rd.cont/100))} incl. contingency`);
+  if(S.lunar.on){ add(S.lunar.start,"R&D",`Lunar payload program starts: choose the CLPS path (NASA payload selection or commercial slot); budget ${fm(S.lunar.dev*(1+S.lunar.cont/100))}${S.lunar.nasa?"":` plus ${fm(S.lunar.mass*S.lunar.perKg)} delivery`}`);
+    add(Math.min(QN-1,S.lunar.start+Math.floor((S.lunar.flight-S.lunar.start)/2)),"R&D","Lunar payload critical design review; flight qualification build begins");
+    add(Math.min(QN-1,S.lunar.flight),"R&D",`AERIS lunar payload delivered to the lander provider for a CLPS mission (${S.lunar.mass} kg)`); }
+  add(R.deals.findIndex(v=>v>0),"Sales","First 3DaaS contracts signed from the qualified lead pipeline");
+  R.y1.filter(d=>d.big).forEach(d=>add(d.q,"Sales",`3DaaS contract above $40K: ${fUSD(d.v)}`));
+  add(R.sysOrders.findIndex(v=>v>0),"Sales","First AERIS 1.0 system order; 50% deposit received");
+  add(R.units.findIndex(v=>v>0),"Manufacturing","First AERIS 1.0 system delivered and commissioned");
+  R.ann.forEach((a,y)=>add(y*4,"Manufacturing",`Production plan: about ${a.units} systems for customers and ${R.built.slice(y*4,y*4+4).reduce((s,v)=>s+v,0)} for the 3DaaS fleet at ${a.margin}% target gross margin`));
+  add(R.firstLarge,"Sales","First large government or prime award expected (program of record, production or payload contract)");
+  if(R.capBind>=0) add(R.capBind,"Manufacturing","3DaaS demand exceeds fleet capacity; added machines needed to keep up");
+  if(R.c20>=0) add(R.c20,"Sales","20 cumulative customers, commercial and government");
+  if(R.be!=null) add(R.be,"Finance","EBITDA break-even, sustained from this quarter");
+  if(R.cfp!=null) add(R.cfp,"Finance","Cash flow positive after capex, sustained from this quarter");
+  add(R.minQ,"Finance",R.minCash<0?`Cash low point ${fm(R.minCash)}: funding gap to close before this quarter`:`Cash low point: ${fm(R.minCash)}`);
+  return out;
+}
+function renderMs(R){
+  const all=autoMs(R).concat(S.planned.map((m,i)=>({...m,i}))).filter(m=>msFilter.has(m.c));
+  $("msList").innerHTML=YRS.map((yr,y)=>{
+    const qs=[0,1,2,3].map(k=>{ const q=y*4+k; const items=all.filter(m=>m.q===q); if(!items.length) return "";
+      return `<div class="ms-q"><div class="ql">${qLabel(q)}<small>Rev ${fm(R.rev[q])} · Cash ${fm(R.cash[q])}</small></div><div class="ms-items">${items.map(m=>`<div class="ms"><span class="chip ${catCls(m.c)}">${m.c}</span><span class="t">${esc(m.t)}</span><span class="src">${m.auto?"From model":"Planned"}</span>${m.auto?"":`<button type="button" class="x danger" data-del="${m.i}" aria-label="Remove milestone">Remove</button>`}</div>`).join("")}</div></div>`; }).join("");
+    return `<div class="ms-year"><h3>${yr}</h3>${qs||'<div class="ms-q"><div class="muted">No milestones in the selected categories.</div></div>'}</div>`;
+  }).join("");
+  window.__msAll=all;
+}
+
+/* ================= CHARTS ================= */
+function niceStep(max,n){ const raw=max/n; const p=Math.pow(10,Math.floor(Math.log10(raw||1))); const f=raw/p; return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p; }
+const axisK=v=>{ const a=Math.abs(v), s=v<0?"−":""; return a>=1000? s+"$"+(+(a/1000).toFixed(a>=10000?0:1))+"M" : s+"$"+Math.round(a)+"K"; };
+function revChart(R){
+  const n=S.range==="early"?8:QN, W=760,H=300,L=62,Rr=14,T=14,B=38;
+  const rows=[...Array(n).keys()].map(q=>({q,s:[[R.d3[q],"var(--s1)","3DaaS"],[R.prod[q],"var(--s2)","Systems"],[R.gov[q],"var(--s4)","Government"],[R.svc[q],"var(--s3)","Setup and support"]],cost:R.cogs[q]+R.opex[q],tot:R.rev[q]}));
+  const max=Math.max(10,...rows.map(r=>Math.max(r.tot,r.cost)));
+  const st=niceStep(max,5), top=Math.ceil(max/st)*st;
+  const y=v=>T+(1-v/top)*(H-T-B), bw=(W-L-Rr)/n, x=i=>L+i*bw;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Quarterly revenue by line versus total costs" font-family="IBM Plex Mono, monospace" font-size="11">`;
+  for(let t=0;t<=top+1e-9;t+=st) s+=`<line x1="${L}" x2="${W-Rr}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)"/><text x="${L-8}" y="${y(t)+4}" text-anchor="end" fill="var(--muted)">${axisK(t)}</text>`;
+  R.rounds.forEach(rd=>{ if(rd.q<n){ s+=`<line x1="${x(rd.q)}" x2="${x(rd.q)}" y1="${T}" y2="${H-B}" stroke="var(--target)" stroke-dasharray="4 3"/><text x="${x(rd.q)+4}" y="${T+10}" fill="var(--target)" font-weight="600">${rd.c.name}</text>`; } });
+  rows.forEach((r,i)=>{ const bx=x(i)+bw*0.18, w=bw*0.64; let b=0;
+    r.s.forEach(([v,c,l])=>{ if(v>0){ s+=`<rect x="${bx}" y="${y(b+v)}" width="${w}" height="${Math.max(0,y(b)-y(b+v))}" fill="${c}"><title>${qLabel(r.q)} ${l}: ${fm(v)}</title></rect>`; b+=v; } });
+    const lab=n<=8?qLabel(r.q).replace(" 20","'"):(r.q%4===0?String(Y0+r.q/4):"");
+    if(lab) s+=`<text x="${n<=8?x(i)+bw/2:x(i)+2}" y="${H-B+16}" text-anchor="${n<=8?"middle":"start"}" fill="var(--muted)">${lab}</text>`;
+  });
+  s+=`<polyline points="${rows.map((r,i)=>`${x(i)+bw/2},${y(r.cost)}`).join(" ")}" fill="none" stroke="var(--ink)" stroke-width="2"/>`;
+  rows.forEach((r,i)=>s+=`<circle cx="${x(i)+bw/2}" cy="${y(r.cost)}" r="2.6" fill="var(--ink)"><title>${qLabel(r.q)} costs: ${fm(r.cost)}</title></circle>`);
+  $("revChart").innerHTML=s+`</svg>`;
+}
+function cashChart(R){
+  const W=760,H=260,L=62,Rr=14,T=22,B=36,n=QN;
+  const mx=Math.max(10,...R.cash), mn=Math.min(0,...R.cash);
+  const st=niceStep(mx-mn,5), top=Math.ceil(mx/st)*st, bot=Math.floor(mn/st)*st;
+  const y=v=>T+(top-v)/(top-bot)*(H-T-B), x=i=>L+(i+0.5)*(W-L-Rr)/n;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="End of quarter cash balance" font-family="IBM Plex Mono, monospace" font-size="11">`;
+  for(let t=bot;t<=top+1e-9;t+=st) s+=`<line x1="${L}" x2="${W-Rr}" y1="${y(t)}" y2="${y(t)}" stroke="${Math.abs(t)<1e-9?"var(--muted)":"var(--line)"}"/><text x="${L-8}" y="${y(t)+4}" text-anchor="end" fill="var(--muted)">${axisK(t)}</text>`;
+  s+=`<path d="M${x(0)},${y(0)} ${R.cash.map((v,i)=>`L${x(i)},${y(v)}`).join(" ")} L${x(n-1)},${y(0)} Z" fill="var(--accent)" fill-opacity="0.10"/>`;
+  s+=`<polyline points="${R.cash.map((v,i)=>`${x(i)},${y(v)}`).join(" ")}" fill="none" stroke="var(--accent)" stroke-width="2"/>`;
+  R.cash.forEach((v,i)=>{ s+=`<circle cx="${x(i)}" cy="${y(v)}" r="${i===R.minQ?4.5:2.6}" fill="${v<0?"var(--bad)":"var(--accent)"}"><title>${qLabel(i)}: ${fm(v)}</title></circle>`;
+    if(i%4===0) s+=`<text x="${x(i)}" y="${H-B+16}" text-anchor="middle" fill="var(--muted)">${qLabel(i).replace(" 20","'")}</text>`;
+    if(R.funding[i]>0) s+=`<path d="M${x(i)-5},${H-B+2} L${x(i)+5},${H-B+2} L${x(i)},${H-B-6} Z" fill="var(--target)"><title>Funding ${fm(R.funding[i])}</title></path>`; });
+  const mq=R.minQ, mv=R.cash[mq];
+  s+=`<text x="${Math.min(Math.max(x(mq),L+60),W-80)}" y="${y(mv)-10}" text-anchor="middle" fill="${mv<0?"var(--bad)":"var(--ink)"}" font-weight="600">Low ${fm(mv)}</text>`;
+  $("cashChart").innerHTML=s+`</svg>`;
+}
+
+/* ================= TABLES ================= */
+function annualTable(R){
+  const rows=[["Total revenue","rev",1],["Commercial 3DaaS","d3"],["AERIS system sales","prod"],["Government and prime contracts","gov"],["Setup and support","svc"],["Gross margin","gm"],["Operating expenses","opex"],["EBITDA","ebitda",1],["Capex (production line and fleet)","capex"],["Ending cash","cash",1],
+    ["Qualified leads per month (year end)","leads","n"],["3DaaS contracts","deals","n"],["3DaaS demand not served (capacity)","unserved"],["System orders","orders","n"],["Systems delivered","units","n"],["System backlog (year end)","backlog","n"],["3DaaS fleet machines (year end)","fleet","n"],["Government awards (expected value)","govAw"],["Full-time headcount (year end)","head","n"]];
+  $("annualTbl").innerHTML=`<thead><tr><th></th>${YRS.map(y=>`<th class="r">${y}</th>`).join("")}</tr></thead><tbody>`+rows.map(([l,k,b])=>`<tr class="${b===1?"tot":""}"><td>${l}</td>${R.ann.map(a=>{ if(k==="gm") return `<td class="n">${a.rev?pct(a.gp/a.rev):"n/a"}</td>`; const v=a[k]; return b==="n"?`<td class="n">${Math.round(v).toLocaleString("en-US")}</td>`:`<td class="n ${v<0?"neg":""}">${fm(v)}</td>`; }).join("")}</tr>`).join("")+`</tbody>`;
+}
+function cmpTable(A,B){
+  const qn=q=>q==null||q<0?"Not within plan":qLabel(q);
+  const rows=[["2027 revenue",r=>fm(r.ann[0].rev)],["2029 revenue",r=>fm(r.ann[2].rev)],["2031 revenue",r=>fm(r.ann[4].rev)],["2031 EBITDA",r=>fm(r.ann[4].ebitda)],["Government share of 2031 revenue",r=>pct(r.ann[4].gov/(r.ann[4].rev||1))],["Systems delivered, 5 years",r=>r.units.reduce((a,b)=>a+b,0)],["Revenue in the 12 months before Series A",r=>{ const a=r.rounds.find(x=>x.key==="a"); return a?fm(a.ttm):"No Series A"; }],["EBITDA break-even",r=>qn(r.be)],["Cash flow positive after capex",r=>qn(r.cfp)],["Cash low point",r=>`${fm(r.minCash)} (${qLabel(r.minQ)})`],["Funding gap at low point",r=>r.minCash<0?fm(-r.minCash):"None"],["Full-time headcount, end 2031",r=>r.head[QN-1]]];
+  $("cmpTbl").innerHTML=`<thead><tr><th></th><th class="r">Founder plan</th><th class="r">Investor case</th></tr></thead><tbody>`+rows.map(([l,f])=>`<tr><td>${l}</td><td class="n">${f(A)}</td><td class="n">${f(B)}</td></tr>`).join("")+`</tbody>`;
+}
+let TSV="";
+function planTable(R){
+  const L=[["Commercial pipeline and capacity"],["Qualified leads per month",R.leads,"n"],["3DaaS contracts signed",R.deals,"n"],["System orders (deposit received)",R.sysOrders,"n"],["Production capacity (systems per quarter)",R.cap,"n"],["Systems delivered to customers",R.units,"n"],["System backlog",R.backlog,"n"],["Machines built for 3DaaS fleet",R.built,"n"],["3DaaS fleet machines",R.fleet,"n"],["3DaaS demand not served",R.unserved],
+    ["Government and primes"],["Bids submitted (all tiers)",R.govBids,"n"],["Awards (expected count)",R.govAwardCnt,"n"],["Award value (expected)",R.govAwards],
+    ["People"],["Full-time headcount",R.head,"n"],["of which round-funded hires",R.roundHead,"n"],["of which hires to support revenue",R.scaleHead,"n"],["Cumulative customers",R.custCum,"n"],
+    ["Revenue ($K)"],["Commercial 3DaaS",R.d3],["AERIS system sales",R.prod],["Government and prime contracts",R.gov],["Setup, support, add-ons",R.svc],["Total revenue",R.rev,"t"],
+    ["Cost of revenue ($K)"],["3DaaS direct cost",R.d3cogs],["System build cost",R.prodCogs],["Government contract direct cost",R.govCost],["Setup and support cost",R.svcCogs],["Gross profit",R.gp,"t"],["Gross margin",R.gp.map((g,q)=>R.rev[q]?g/R.rev[q]:NaN),"p"],
+    ["Operating expenses ($K)"],["Full-time staff",R.staff],["Part-time contractors",R.contr],["Sales and marketing (added leads)",R.sm],["Core and round-funded R&D",R.core],["AERIS Mini (LEO)",R.mini],["Lunar payload (CLPS)",R.lunar],["Legal, finance, accounting, G&A",R.ga],["Facilities, software, insurance",R.over],["Total operating expenses",R.opex,"t"],["EBITDA",R.ebitda,"t"],
+    ["Cash ($K)"],["Cash received (incl. deposits)",R.receipts],["Operating cash flow",R.opcf],["Production line and facility capex",R.prodCapex.map(v=>-v)],["3DaaS fleet capex",R.fleetCapex.map(v=>-v)],["Funding",R.funding],["Net cash flow",R.net],["Ending cash",R.cash,"t"]];
+  let h=`<thead><tr><th></th>${YRS.map(y=>`<th class="yr" colspan="4">${y}</th>`).join("")}</tr><tr><th>$K</th>${[...Array(QN).keys()].map(q=>`<th class="r ${q%4===0?"ys":""}">Q${q%4+1}</th>`).join("")}</tr></thead><tbody>`;
+  TSV="Line item\t"+[...Array(QN).keys()].map(qLabel).join("\t")+"\n";
+  L.forEach(([l,a,k])=>{
+    if(!a){ h+=`<tr class="sec"><td colspan="${QN+1}">${l}</td></tr>`; TSV+=l+"\n"; return; }
+    h+=`<tr class="${k==="t"?"tot":""}"><td>${l}</td>`+a.map((v,q)=>{ const txt=k==="n"?n1(v):k==="p"?(isFinite(v)?(v*100).toFixed(0)+"%":"–"):fk(v); return `<td class="n ${q%4===0?"ys":""} ${v<-0.5&&k!=="n"?"neg":""}">${txt}</td>`; }).join("")+`</tr>`;
+    TSV+=l+"\t"+a.map(v=>k==="p"?(isFinite(v)?(v*100).toFixed(1)+"%":""):k==="n"?(Math.round(v*10)/10):Math.round(v)).join("\t")+"\n";
+  });
+  $("planTbl").innerHTML=h+`</tbody>`;
+}
+function roundCards(R){
+  const all=S.funding.filter(f=>f.round&&+f.amt>0);
+  $("rounds").innerHTML=R.rounds.map(rd=>{
+    const hireCost=rd.c.hires*rd.c.hireMo*3*(1+S.staff.burden/100);
+    const post=rd.key==="a"? rd.amt/(S.val.aDil/100):null;
+    return `<div class="round"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap"><h3>${esc(rd.n)}</h3><span class="amt">${fm(rd.amt)}</span></div>
+    <span class="muted" style="font-size:13px">Closes ${qLabel(rd.q)} · ramps to full effect by ${qLabel(rd.endQ)}</span>
+    <dl>
+      <dt>Cash before close</dt><dd>${fm(rd.cashBefore)}</dd>
+      <dt>Revenue, 12 months before close</dt><dd>${fm(rd.ttm)}</dd>
+      <dt>Full-time hires funded</dt><dd>${rd.c.hires} (${fm(hireCost)}/qtr at full ramp)</dd>
+      <dt>Production line and facility capex</dt><dd>${fm(rd.c.capex)}</dd>
+      <dt>Added R&amp;D, first 2 years</dt><dd>${fm(rd.spend.rd)}</dd>
+      <dt>Sales and marketing, first 2 years</dt><dd>${fm(rd.spend.sm)}</dd>
+      <dt>Qualified leads/month at full ramp</dt><dd>${Math.round(rd.leadsEnd).toLocaleString("en-US")}</dd>
+      <dt>Production capacity at full ramp</dt><dd>${n1(rd.capEnd)} systems/qtr</dd>
+      <dt>Full-time headcount at full ramp</dt><dd>${rd.headEnd}</dd>
+      ${post?`<dt>Post-money at ${S.val.aDil}% dilution</dt><dd>${fm(post)} (${rd.ttm?(post/rd.ttm).toFixed(1)+"× trailing revenue":"no trailing revenue"})</dd>`:""}
+    </dl></div>`; }).join("") || `<p class="muted">No rounds in the plan. Add an amount to a Seed or Series A row on the Assumptions tab.</p>`;
+}
+
+/* ================= RENDER ================= */
+let RES={};
+function recalc(){
+  const P=compute("plan"), I=compute("investor"); RES={plan:P,investor:I};
+  const A=S.scenario==="investor"?I:P, lbl=S.scenario==="investor"?"Investor case":"Founder plan";
+  ["scnLabel","planScn","msScn","valScn"].forEach(id=>$(id).textContent=lbl);
+  document.querySelectorAll("[data-scn]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.scn===S.scenario));
+  document.querySelectorAll("[data-range]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.range===S.range));
+  const qn=q=>q==null||q<0?"Beyond 2031":qLabel(q);
+  const a5=A.ann[4];
+  $("kpis").innerHTML=
+    `<div class="kpi lead"><span class="eyebrow">2031 revenue</span><span class="v">${fm(a5.rev)}</span><span class="s">2027: ${fm(A.ann[0].rev)} · 2029: ${fm(A.ann[2].rev)}</span></div>`+
+    `<div class="kpi"><span class="eyebrow">EBITDA break-even</span><span class="v">${qn(A.be)}</span><span class="s">Sustained from this quarter</span></div>`+
+    `<div class="kpi"><span class="eyebrow">Cash low point</span><span class="v" style="color:${A.minCash<0?"var(--bad)":"inherit"}">${fm(A.minCash)}</span><span class="s">${qLabel(A.minQ)}</span></div>`+
+    `<div class="kpi"><span class="eyebrow">Equity raised in plan</span><span class="v">${fm(A.fundTotal)}</span>${A.minCash<0?`<span class="pill bad">Short by ${fm(-A.minCash)}</span>`:`<span class="pill good">Covers the low point</span>`}</div>`+
+    `<div class="kpi"><span class="eyebrow">Peak quarterly burn</span><span class="v">${fm(A.peakBurn)}</span><span class="s">Operating cash out net of receipts, incl. capex</span></div>`+
+    `<div class="kpi"><span class="eyebrow">Government share, 2031</span><span class="v">${pct(a5.gov/(a5.rev||1))}</span><span class="s">First large award: ${qn(A.firstLarge)}</span></div>`+
+    `<div class="kpi"><span class="eyebrow">Systems delivered</span><span class="v">${A.units.reduce((a,b)=>a+b,0).toLocaleString("en-US")}</span><span class="s">Plus ${A.built.reduce((a,b)=>a+b,0)} built for the 3DaaS fleet</span></div>`+
+    `<div class="kpi"><span class="eyebrow">Headcount, end 2031</span><span class="v">${A.head[QN-1]}</span><span class="s">Revenue per head: ${fm(a5.rev/(A.head[QN-1]||1))}</span></div>`;
+  const ins=[], sd=A.rounds.find(x=>x.key==="seed"), sa=A.rounds.find(x=>x.key==="a");
+  if(sd) ins.push(`The Seed closes ${qLabel(sd.q)}. By ${qLabel(sd.endQ)} it lifts qualified leads from ${S.com.leads} to about ${Math.round(sd.leadsEnd)} a month and production to ${n1(sd.capEnd)} systems a quarter, with ${sd.headEnd} full-time staff.`);
+  if(sa) ins.push(`The Series A closes ${qLabel(sa.q)}, after the LEO flight window, on ${fm(sa.ttm)} of trailing 12-month revenue. At ${S.val.aDil}% dilution that is a ${fm(sa.amt/(S.val.aDil/100))} post-money, or ${sa.ttm?(sa.amt/(S.val.aDil/100)/sa.ttm).toFixed(1)+"×":"n/a"} trailing revenue.`);
+  ins.push(`Government revenue lags bids by 6 to 18 months: the first large award is expected in ${qn(A.firstLarge)}, and government work is ${pct(a5.gov/(a5.rev||1))} of 2031 revenue.`);
+  if(A.capBind>=0) ins.push(`3DaaS demand outruns fleet capacity from ${qLabel(A.capBind)}; ${fm(A.unserved.reduce((a,b)=>a+b,0))} of demand goes unserved over the plan because customer systems take priority on the production line.`);
+  if(A.headCapQ>=0) ins.push(`Headcount reaches the ${S.staff.maxHead}-person cap in ${qLabel(A.headCapQ)}. 2031 revenue per employee is ${fm(a5.rev/(A.head[QN-1]||1))}, which assumes contract manufacturing for system assembly.`);
+  ins.push(A.minCash<0?`Cash goes negative in ${qLabel(A.cash.findIndex(v=>v<0))}. The plan needs about ${fm(-A.minCash)} more, or earlier funding.`:`The two rounds keep cash positive throughout; the lowest balance is ${fm(A.minCash)} in ${qLabel(A.minQ)}.`);
+  $("insights").innerHTML=ins.map(t=>`<li>${t}</li>`).join("");
+  roundCards(A); revChart(A); cashChart(A); annualTable(A); cmpTable(P,I); planTable(A); renderMs(A); miniTable();
+  $("y1Deals").innerHTML=`<thead><tr><th>Quarter</th><th>Contracts</th><th class="r">Quarter total</th></tr></thead><tbody>`+[0,1,2,3].map(q=>{ const d=P.y1.filter(x=>x.q===q); return `<tr><td>${qLabel(q)}</td><td class="num" style="font-size:12.5px">${d.length>14?`${d.length} contracts, ${d.filter(x=>x.big).length} above $40K`:(d.map(x=>`${x.big?"<b>":""}${fUSD(x.v)}${x.big?"</b>":""}`).join(", ")||"None")}</td><td class="n">${fUSD(d.reduce((a,x)=>a+x.v,0))}</td></tr>`; }).join("")+`<tr class="tot"><td>2027</td><td>${P.y1.length} contracts</td><td class="n">${fUSD(P.y1.reduce((a,x)=>a+x.v,0))}</td></tr></tbody>`;
+  const sdP=P.rounds.find(x=>x.key==="seed"), saP=P.rounds.find(x=>x.key==="a");
+  $("flags").innerHTML=`<b>How "10× faster" is modeled, and what to check</b><ul class="list">
+    <li>Each round multiplies lead generation and production capacity by its scale-up factor, phased in over the ramp: Seed 5× leads and 4× production over 6 quarters, Series A 4× leads and 5× production over 8 quarters. Together that reaches about ${saP?Math.round(saP.leadsEnd).toLocaleString("en-US"):"n/a"} qualified leads a month and ${saP?n1(saP.capEnd):"n/a"} systems a quarter by ${saP?qLabel(saP.endQ):"the end of the ramp"}.</li>
+    <li>Headcount is capped at ${S.staff.maxHead}. Past the cap, growth assumes contract manufacturing and automation, which sit inside the build cost and the 3DaaS direct cost.</li>
+    <li>Government bids scale 2.5× per round: the number of NASA and DoD solicitations is fixed, so money widens what you can bid on and team for rather than multiplying it. Win rates rise after TRL 7 and LEO heritage.</li>
+    <li>Revenue from each round arrives later than the money: 2 quarters for systems, 2 to 6 quarters for government awards, and up to 8 quarters of contract performance after that.</li>
+    <li>"Consumer audiences" is modeled as commercial customers (space, defense, mining and industrial buyers of 3DaaS and systems), separate from government and primes.</li>
+    <li>Placeholders to replace: opening cash ($25K), lunar payload development ($6M), round-funded hire counts and costs, production capex, and the government tier values and win rates.</li></ul>`;
+  const v=valuation(A,RES);
+  $("valKpis").innerHTML=`<div class="kpi lead"><span class="eyebrow">Blended pre-money</span><span class="v">${fM(v.pre)}</span><span class="s">Range ${fM(v.lo)} to ${fM(v.hi)}</span></div>`+
+   `<div class="kpi"><span class="eyebrow">Cap implies pre-money</span><span class="v">${fM(v.capPre)}</span><span class="pill ${v.pre>=v.capPre?"good":"bad"}">${v.pre>=v.capPre?"Supported by ":"Below cap by "}${fM(Math.abs(v.pre-v.capPre))}</span></div>`+
+   `<div class="kpi"><span class="eyebrow">2031 plan revenue</span><span class="v">${fM(v.y5)}</span><span class="s">Cap needs ${fM(v.reqRev)} at ${S.val.vc.mult}×</span></div>`+
+   `<div class="kpi"><span class="eyebrow">Investor ownership at cap</span><span class="v">${pct(S.val.raise/S.val.cap)}</span><span class="s">At model value: ${pct(S.val.raise/(v.pre+S.val.raise))}</span></div>`;
+  METHODS.forEach(m=>{ $("bv_"+m.k).textContent=fM(v[m.k]); $("ba_"+m.k).textContent=fM(v.adj(m.k)); $("bc_"+m.k).textContent=v.wsum?fM(v.adj(m.k)*S.val.weights[m.k]/v.wsum):"n/a"; $("mv_"+m.k).textContent=fM(v.adj(m.k)); });
+  $("blendFoot").innerHTML=`<tr class="tot"><td>Blended pre-money (after ${(v.h*100).toFixed(0)}% IP haircut)</td><td class="n">${fM(v.blend)}</td><td class="n">${fM(v.pre)}</td><td class="n">${v.wsum}%</td><td class="n">${fM(v.pre)}</td></tr>`;
+  $("scNote").innerHTML=v.scW!==100?`<span class="pill bad">Weights total ${v.scW}%; they should total 100%</span>`:"";
+  $("vcNote").innerHTML=`<b>Linked to the ${lbl.toLowerCase()}.</b> 2031 revenue of ${fM(v.y5)} × ${S.val.vc.mult}× gives an exit of ${fM(v.exit)}. With ${S.val.vc.ret}% ownership kept and a ${S.val.vc.roi}× target return, post-money today is ${fM(v.post)}. The ${fM(S.val.cap)} cap needs ${fM(v.reqRev)} of 2031 revenue.`;
+  $("fcTbl").innerHTML=`<thead><tr><th>Scenario</th><th class="r">Probability</th><th class="r">2031 revenue</th><th class="r">Multiple</th><th class="r">Exit value</th></tr></thead><tbody>`+v.fcS.map(s=>`<tr><td>${s.n}</td><td class="n">${s.p}%</td><td class="n">${fM(s.rev)}</td><td class="n">${s.m}×</td><td class="n">${fM(s.rev*s.m)}</td></tr>`).join("")+`<tr class="tot"><td>Weighted, discounted ÷ ${v.df.toFixed(2)}</td><td class="n">${v.fcP}%</td><td></td><td></td><td class="n">${fM(v.fc)}</td></tr></tbody>`;
+  $("fwdNote").textContent=`Next four quarters of revenue (${lbl.toLowerCase()}): ${fM(v.n12)} × ${S.val.fwd.mult}× = ${fM(v.fwd)}.`;
+  window.__v=v; window.__A=A;
+}
+
+/* ================= EVENTS ================= */
+document.addEventListener("input",e=>{ const t=e.target; if(!t.dataset||!t.dataset.path||t.type==="checkbox") return;
+  let v; if(t.dataset.kind==="text") v=t.value; else if(t.tagName==="SELECT") v=+t.value; else { v=parseFloat(t.value); if(!isFinite(v)) v=0; }
+  setP(t.dataset.path,v); save(); recalc(); });
+document.addEventListener("change",e=>{ const t=e.target; if(t.type==="checkbox"&&t.dataset.path){ setP(t.dataset.path,t.checked); save(); recalc(); } });
+document.addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return;
+  if(b.dataset.scn){ S.scenario=b.dataset.scn; save(); recalc(); }
+  else if(b.dataset.range){ S.range=b.dataset.range; save(); recalc(); }
+  else if(b.dataset.tab){ showTab(b.dataset.tab); }
+  else if(b.dataset.risk!==undefined){ const i=+b.dataset.risk; S.val.rfs.r[i].s=+b.dataset.val; document.querySelectorAll(`[data-risk="${i}"]`).forEach(x=>x.setAttribute("aria-pressed",x===b)); save(); recalc(); }
+  else if(b.dataset.cat){ const c=b.dataset.cat; if(msFilter.has(c)) msFilter.delete(c); else msFilter.add(c); b.setAttribute("aria-pressed",msFilter.has(c)); renderMs(window.__A); }
+  else if(b.dataset.del!==undefined){ S.planned.splice(+b.dataset.del,1); save(); renderMs(window.__A); }
+});
+$("msAdd").addEventListener("click",()=>{ const t=$("msT").value.trim(); if(!t){ toast("Type the milestone text first."); $("msT").focus(); return; } S.planned.push({q:+$("msQ").value,c:$("msC").value,t}); $("msT").value=""; save(); renderMs(window.__A); toast("Milestone added."); });
+$("reroll").addEventListener("click",()=>{ S.com.seed=Math.floor(Math.random()*99999)+1; $("f_com_seed").value=S.com.seed; save(); recalc(); toast("Contract values re-drawn."); });
+$("reset").addEventListener("click",()=>{ S=clone(DEFAULTS); try{localStorage.removeItem(KEY);}catch(e){} buildInputs(); recalc(); showTab("overview"); toast("Defaults restored."); });
+function toast(t){ $("toast").textContent=t; clearTimeout(window.__t); window.__t=setTimeout(()=>$("toast").textContent="",2600); }
+async function copy(text,label){ try{ await navigator.clipboard.writeText(text); toast(label+" copied."); } catch(e){ const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); toast(label+" copied."); }catch(_){ toast("Copy is blocked here. Select the table and copy it manually."); } ta.remove(); } }
+$("copyTsv").addEventListener("click",()=>copy(TSV,"Quarterly table"));
+$("copyMs").addEventListener("click",()=>{ const all=(window.__msAll||[]).slice().sort((a,b)=>a.q-b.q); copy(all.map(m=>`${qLabel(m.q)}\t${m.c}\t${m.t}\t${m.auto?"From model":"Planned"}`).join("\n"),"Milestones"); });
+$("copySummary").addEventListener("click",()=>{ const A=window.__A, v=window.__v, lbl=S.scenario==="investor"?"Investor case":"Founder plan";
+  const t=[`Space Copy Inc. operating plan, ${lbl}, Q1 2027 to Q4 2031`,
+    ...A.rounds.map(rd=>`${rd.n}: ${fm(rd.amt)} closing ${qLabel(rd.q)}; ${rd.c.hires} hires, ${fm(rd.c.capex)} production capex`),
+    ...A.ann.map(a=>`${a.yr}: revenue ${fm(a.rev)} (3DaaS ${fm(a.d3)}, systems ${fm(a.prod)}, government ${fm(a.gov)}) | EBITDA ${fm(a.ebitda)} | ending cash ${fm(a.cash)} | ${a.units} systems | ${a.head} FT staff`),
+    `EBITDA break-even: ${A.be==null?"beyond 2031":qLabel(A.be)}`,`Cash low point: ${fm(A.minCash)} in ${qLabel(A.minQ)}`,
+    `Blended seed pre-money: ${fM(v.pre)} (cap implies ${fM(v.capPre)})`].join("\n"); copy(t,"Summary"); });
+function showTab(t){ S.tab=t; save(); document.querySelectorAll("[data-tab]").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t)); ["overview","plan","milestones","assumptions","valuation"].forEach(k=>$("tab-"+k).hidden=k!==t); }
+
+buildInputs(); recalc();
+const h0=(location.hash||"").slice(1); showTab(["overview","plan","milestones","assumptions","valuation"].includes(h0)?h0:(S.tab||"overview"));
+</script>
